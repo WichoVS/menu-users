@@ -48,6 +48,11 @@ public class RoleRepository : IRoleRepository
         return await _context.Roles.FindAsync(id);
     }
 
+    public async Task<Role?> GetByNameAsync(string name)
+    {
+        return await _context.Roles.FirstOrDefaultAsync(r => r.Name == name);
+    }
+
     public async Task<Role?> UpdateAsync(Role entity)
     {
         Role? role = await _context.Roles.FindAsync(entity.Id);

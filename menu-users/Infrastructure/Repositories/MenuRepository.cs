@@ -1,33 +1,67 @@
 using System;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
+using menu_users.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace menu_users.Infrastructure.Repositories;
 
 public class MenuRepository : IMenuRepository
 {
-    public Task<Menu> AddAsync(Menu entity)
+    private readonly AppDbContext _context;
+
+    public MenuRepository(AppDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task<bool> DeleteAsync(Menu entity)
+    public async Task<Menu> AddAsync(Menu entity)
     {
-        throw new NotImplementedException();
+        await _context.Menus.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
-    public Task<IEnumerable<Menu>> GetAllAsync()
+    public async Task<bool> DeleteAsync(Menu entity)
     {
-        throw new NotImplementedException();
+        Menu? menu = await _context.Menus.FindAsync(entity.Id);
+        if (menu == null)
+        {
+            return false;
+        }
+
+        // Solo pasa a poner en activo = false, no eliminamos completamente
+        menu.IsActive = false;
+        _context.Menus.Update(menu);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<IEnumerable<Menu>> GetAllAsync()
+    {
+        return await _context.Menus.Include(ch => ch.SubMenus).Where(m => m.IsActive).ToListAsync();
     }
 
     public Task<Menu?> GetByIdAsync(object id)
     {
-        throw new NotImplementedException();
+        return _context.Menus.Include(ch => ch.SubMenus).FirstOrDefaultAsync(m => m.Id == (int)id);
     }
 
-    public Task<Menu?> UpdateAsync(Menu entity)
+    public async Task<Menu?> UpdateAsync(Menu entity)
     {
-        throw new NotImplementedException();
+        Menu? menuExists = await _context.Menus.FirstOrDefaultAsync(m => m.Id == entity.Id);
+        if (menuExists == null)
+        {
+            return null;
+        }
+
+        menuExists.Name = entity.Name;
+        menuExists.Url = entity.Url;
+        menuExists.IsMain = entity.IsMain;
+        menuExists.ParentMenuId = entity.ParentMenuId;
+        menuExists.MinimumHierarchy = entity.MinimumHierarchy;
+        _context.Menus.Update(menuExists);
+        await _context.SaveChangesAsync();
+        return menuExists;
     }
 }

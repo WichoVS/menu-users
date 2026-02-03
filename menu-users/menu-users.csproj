@@ -26,11 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application/DTOs/" />
+    <Folder Include="Application/DTOs/ApiResponse/" />
     <Folder Include="Application/DTOs/Auth/" />
+    <Folder Include="Application/DTOs/User/" />
     <Folder Include="Application/Mappings/" />
     <Folder Include="Controllers/" />
     <Folder Include="Controllers/Auth/" />
+    <Folder Include="Controllers/Role/" />
     <Folder Include="Infrastructure/" />
     <Folder Include="Infrastructure/Configurations/" />
     <Folder Include="Infrastructure/Data/" />

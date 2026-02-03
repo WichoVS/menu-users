@@ -17,6 +17,7 @@ var db = builder.Configuration.GetSection("db");
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 //Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -36,20 +37,18 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 var jwt = builder.Configuration.GetSection("jwt");
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
-    options.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = ctx =>
-        {
-            Console.WriteLine("JWT ERROR: " + ctx.Exception.Message);
-            return Task.CompletedTask;
-        }
-    };
-
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -74,6 +73,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

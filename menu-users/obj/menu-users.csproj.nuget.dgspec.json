@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj": {}
+    "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj": {}
   },
   "projects": {
-    "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj": {
+    "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj",
+        "projectUniqueName": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj",
         "projectName": "menu-users",
-        "projectPath": "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj",
-        "packagesPath": "C:\\Users\\Luis\\.nuget\\packages\\",
-        "outputPath": "E:\\Proyectos\\menu-users\\menu-users\\obj\\",
+        "projectPath": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj",
+        "packagesPath": "/Users/luisvillanueva/.nuget/packages/",
+        "outputPath": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Luis\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/luisvillanueva/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -100,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
