@@ -1,38 +1,65 @@
 using System;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
+using menu_users.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace menu_users.Infrastructure.Repositories;
 
-public class RoleRepository : IRepository<Role>
+public class RoleRepository : IRoleRepository
 {
-    public Task AddAsync(Role entity)
+    private readonly AppDbContext _context;
+
+    public RoleRepository(AppDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public void Delete(Role entity)
+    public async Task<Role> AddAsync(Role entity)
     {
-        throw new NotImplementedException();
+        await _context.Roles.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
-    public void Dispose()
+    public async Task<bool> DeleteAsync(Role entity)
     {
-        throw new NotImplementedException();
+        Role? role = await _context.Roles.FindAsync(entity.Id);
+        if (role == null)
+        {
+            return false;
+        }
+
+        //Será necesario actualizar el rol de los usuarios a un Rol por defecto
+
+        role.IsActive = false;
+        _context.Roles.Update(role);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public Task<IEnumerable<Role>> GetAllAsync()
+    public async Task<IEnumerable<Role>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Roles.Where(r => r.IsActive).ToListAsync();
     }
 
-    public Task<Role?> GetByIdAsync(object id)
+    public async Task<Role?> GetByIdAsync(object id)
     {
-        throw new NotImplementedException();
+        return await _context.Roles.FindAsync(id);
     }
 
-    public void Update(Role entity)
+    public async Task<Role?> UpdateAsync(Role entity)
     {
-        throw new NotImplementedException();
+        Role? role = await _context.Roles.FindAsync(entity.Id);
+        if (role == null)
+        {
+            return null;
+        }
+
+        role.Name = entity.Name;
+        role.Hierarchy = entity.Hierarchy;
+        _context.Roles.Update(role);
+        await _context.SaveChangesAsync();
+        return role;
     }
 }

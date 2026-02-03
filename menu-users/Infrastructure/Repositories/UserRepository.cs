@@ -1,38 +1,75 @@
 using System;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
+using menu_users.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace menu_users.Infrastructure.Repositories;
 
-public class UserRepository : IRepository<User>
+public class UserRepository : IUserRepository
 {
-    public Task AddAsync(User entity)
+    private readonly AppDbContext _context;
+
+    public UserRepository(AppDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public void Delete(User entity)
+
+    public async Task<User> AddAsync(User entity)
     {
-        throw new NotImplementedException();
+        await _context.Users.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
-    public void Dispose()
+    public async Task<bool> DeleteAsync(User entity)
     {
-        throw new NotImplementedException();
+        // Solo pasa a poner en activo = false, no eliminamos completamente
+        User? usr = await _context.Users.FirstOrDefaultAsync(u => u.Id == entity.Id);
+        if (usr == null)
+        {
+            return false;
+        }
+
+        usr.IsActive = false;
+        _context.Users.Update(usr);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public Task<IEnumerable<User>> GetAllAsync()
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Users.Include(u => u.Role).Where(u => u.IsActive).ToListAsync();
     }
 
-    public Task<User?> GetByIdAsync(object id)
+    public async Task<User?> GetByIdAsync(object id)
     {
-        throw new NotImplementedException();
+        return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id.ToString() == (string)id);
     }
 
-    public void Update(User entity)
+    public async Task<User?> UpdateAsync(User entity)
     {
-        throw new NotImplementedException();
+        User? usr = await _context.Users.FirstOrDefaultAsync(u => u.Id == entity.Id);
+        if (usr == null)
+        {
+            return null;
+        }
+
+        usr.FirstName = entity.FirstName;
+        usr.LastName = entity.LastName;
+        usr.Email = entity.Email;
+        usr.RoleId = entity.RoleId;
+        usr.Role = entity.Role;
+
+        _context.Users.Update(usr);
+        await _context.SaveChangesAsync();
+        return usr;
     }
+
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
+    }
+
 }

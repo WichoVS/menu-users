@@ -15,8 +15,6 @@ public class PasswordHasherService : IPasswordHasher
 
     private readonly HashAlgorithmName _algorithm = HashAlgorithmName.SHA512;
 
-    private readonly PasswordHasher<object> _passwordHasher = new();
-
     public string Hash(string password)
     {
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);

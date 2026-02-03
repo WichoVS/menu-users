@@ -4,19 +4,14 @@ using menu_users.Domain.Interfaces.Repositories;
 
 namespace menu_users.Infrastructure.Repositories;
 
-public class MenuRepository : IRepository<Menu>
+public class MenuRepository : IMenuRepository
 {
-    public Task AddAsync(Menu entity)
+    public Task<Menu> AddAsync(Menu entity)
     {
         throw new NotImplementedException();
     }
 
-    public void Delete(Menu entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Dispose()
+    public Task<bool> DeleteAsync(Menu entity)
     {
         throw new NotImplementedException();
     }
@@ -31,7 +26,7 @@ public class MenuRepository : IRepository<Menu>
         throw new NotImplementedException();
     }
 
-    public void Update(Menu entity)
+    public Task<Menu?> UpdateAsync(Menu entity)
     {
         throw new NotImplementedException();
     }

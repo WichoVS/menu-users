@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj": {}
+    "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj": {}
   },
   "projects": {
-    "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj": {
+    "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj",
+        "projectUniqueName": "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj",
         "projectName": "menu-users",
-        "projectPath": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/menu-users.csproj",
-        "packagesPath": "/Users/luisvillanueva/.nuget/packages/",
-        "outputPath": "/Users/luisvillanueva/Documents/pp/menu-users/menu-users/obj/",
+        "projectPath": "E:\\Proyectos\\menu-users\\menu-users\\menu-users.csproj",
+        "packagesPath": "C:\\Users\\Luis\\.nuget\\packages\\",
+        "outputPath": "E:\\Proyectos\\menu-users\\menu-users\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/luisvillanueva/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Luis\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
@@ -71,6 +71,14 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[10.0.2, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[10.0.2, )"
+            },
+            "Microsoft.Extensions.Configuration.UserSecrets": {
+              "target": "Package",
+              "version": "[10.0.2, )"
             }
           },
           "imports": [
@@ -92,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.102/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
