@@ -8,9 +8,9 @@ namespace menu_users.Domain.Interfaces.Services;
 public interface IUserService
 {
     Task<ApiResponse<IEnumerable<UserDTO>>> GetAllUsersAsync();
-    Task<ApiResponse<UserDTO>> GetUserByIdAsync(int id);
+    Task<ApiResponse<UserDTO>> GetUserByIdAsync(string id);
     Task<ApiResponse<UserDTO>> CreateUserAsync(SignInRequest request);
-    Task<ApiResponse<UserDTO>> UpdateUserAsync(int id, UpdateUserRequest request);
-    Task<ApiResponse<bool>> DeleteUserAsync(int id);
+    Task<ApiResponse<UserDTO>> UpdateUserAsync(string id, UpdateUserRequest request);
+    Task<ApiResponse<bool>> DeleteUserAsync(string id);
 
 }

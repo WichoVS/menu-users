@@ -47,6 +47,14 @@ public class MenuRepository : IMenuRepository
         return _context.Menus.Include(ch => ch.SubMenus).FirstOrDefaultAsync(m => m.Id == (int)id);
     }
 
+    public async Task<IEnumerable<Menu>> GetMenusByUserHierarchyAsync(int hierarchy)
+    {
+        return await _context.Menus
+            .Where(m => m.MinimumHierarchy <= hierarchy && m.IsActive && m.ParentMenuId == null)
+            .Include(ch => ch.SubMenus)
+            .ToListAsync();
+    }
+
     public async Task<Menu?> UpdateAsync(Menu entity)
     {
         Menu? menuExists = await _context.Menus.FirstOrDefaultAsync(m => m.Id == entity.Id);

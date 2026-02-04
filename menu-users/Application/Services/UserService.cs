@@ -44,26 +44,96 @@ public class UserService : IUserService
             UpdatedAt = DateTime.UtcNow
         };
 
+        User createdUser = await _userRepository.AddAsync(newUser);
+
+        UserDTO userDTO = new UserDTO(
+            createdUser.Id.ToString(),
+            createdUser.FirstName,
+            createdUser.LastName,
+            createdUser.Email,
+            createdUser.RoleId
+        );
+
+        return new ApiResponse<UserDTO>(true, "User created successfully.", userDTO);
     }
 
-    public Task<ApiResponse<bool>> DeleteUserAsync(int id)
+    public async Task<ApiResponse<bool>> DeleteUserAsync(string id)
     {
-        throw new NotImplementedException();
+        User? user = await _userRepository.GetByIdAsync(id);
+
+        if (user == null)
+        {
+            return new ApiResponse<bool>(false, "User not found.", false);
+        }
+
+        bool result = await _userRepository.DeleteAsync(user);
+
+        return new ApiResponse<bool>(true, "User deleted successfully.", result);
     }
 
-    public Task<ApiResponse<IEnumerable<UserDTO>>> GetAllUsersAsync()
+    public async Task<ApiResponse<IEnumerable<UserDTO>>> GetAllUsersAsync()
     {
-        throw new NotImplementedException();
+        IEnumerable<User> users = await _userRepository.GetAllAsync();
+
+        var userDTOs = users.Select(user => new UserDTO(
+            user.Id.ToString(),
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.RoleId
+        ));
+
+        return new ApiResponse<IEnumerable<UserDTO>>(true, "Users retrieved successfully.", userDTOs);
     }
 
-    public Task<ApiResponse<UserDTO>> GetUserByIdAsync(int id)
+    public async Task<ApiResponse<UserDTO>> GetUserByIdAsync(string id)
     {
-        throw new NotImplementedException();
+        User? user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            return new ApiResponse<UserDTO>(false, "User not found.", null);
+        }
+
+        UserDTO userDTO = new UserDTO(
+            user.Id.ToString(),
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.RoleId
+        );
+
+        return new ApiResponse<UserDTO>(true, "User retrieved successfully.", userDTO);
     }
 
-    public Task<ApiResponse<UserDTO>> UpdateUserAsync(int id, UpdateUserRequest request)
+    public async Task<ApiResponse<UserDTO>> UpdateUserAsync(string id, UpdateUserRequest request)
     {
-        throw new NotImplementedException();
+        User? user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            return new ApiResponse<UserDTO>(false, "User not found.", null);
+        }
+
+        user.FirstName = request.FirstName;
+        user.LastName = request.LastName;
+        user.Email = request.Email;
+        user.RoleId = request.RoleId;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        User? updatedUser = await _userRepository.UpdateAsync(user);
+        if (updatedUser == null)
+        {
+            return new ApiResponse<UserDTO>(false, "Failed to update user.", null);
+        }
+
+        UserDTO userDTO = new UserDTO(
+            updatedUser.Id.ToString(),
+            updatedUser.FirstName,
+            updatedUser.LastName,
+            updatedUser.Email,
+            updatedUser.RoleId
+        );
+
+        return new ApiResponse<UserDTO>(true, "User updated successfully.", userDTO);
     }
 
     public string getRandomGeneratedPassword()

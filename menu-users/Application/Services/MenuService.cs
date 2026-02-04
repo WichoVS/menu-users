@@ -1,6 +1,8 @@
 using System;
 using menu_users.Application.DTOs.ApiResponse;
 using menu_users.Application.DTOs.Menu;
+using menu_users.Application.DTOs.Role;
+using menu_users.Application.DTOs.User;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
 using menu_users.Domain.Interfaces.Services;
@@ -11,11 +13,13 @@ public class MenuService : IMenuService
 {
     private readonly IMenuRepository _menuRepository;
     private readonly IUserService _userService;
+    private readonly IRoleService _roleService;
 
-    public MenuService(IMenuRepository menuRepository, IUserService userService)
+    public MenuService(IMenuRepository menuRepository, IUserService userService, IRoleService roleService)
     {
         _menuRepository = menuRepository;
         _userService = userService;
+        _roleService = roleService;
     }
 
     public async Task<ApiResponse<MenuDTO>> CreateMenuAsync(CreateMenu request)
@@ -85,18 +89,85 @@ public class MenuService : IMenuService
         return new ApiResponse<IEnumerable<MenuDTO>>(true, null, menuDTOs);
     }
 
-    public async Task<ApiResponse<IEnumerable<MenuDTO>>> GetMenuByUserIdAsync(int userId)
+    public async Task<ApiResponse<IEnumerable<MenuDTO>>> GetMenuByUserIdAsync(string userId)
     {
-        User? user = await _menuRepository.GetUserByIdAsync(userId);
+        ApiResponse<UserDTO> user = await _userService.GetUserByIdAsync(userId);
+        if (!user.Success)
+        {
+            return new ApiResponse<IEnumerable<MenuDTO>>(false, "User not found.", null);
+        }
+
+        if (user.Data == null)
+        {
+            return new ApiResponse<IEnumerable<MenuDTO>>(false, "User data is null.", null);
+        }
+
+        ApiResponse<RoleResponse> role = await _roleService.GetRoleByIdAsync(user.Data.RoleId);
+        if (!role.Success)
+        {
+            return new ApiResponse<IEnumerable<MenuDTO>>(false, "Role not found.", null);
+        }
+
+        if (role.Data == null)
+        {
+            return new ApiResponse<IEnumerable<MenuDTO>>(false, "Role data is null.", null);
+        }
+
+        IEnumerable<Menu> menus = await _menuRepository.GetMenusByUserHierarchyAsync(role.Data.Hierarchy);
+
+        var menuDTOs = menus.Select(m => new MenuDTO
+        (
+            IdMenu: m.Id,
+            Name: m.Name,
+            Route: m.Url,
+            IsMain: m.IsMain.ToString(),
+            ParentId: m.ParentMenuId,
+            Children: m.SubMenus != null
+                ? m.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
+                (
+                    IdMenu: sm.Id,
+                    Name: sm.Name,
+                    Route: sm.Url,
+                    IsMain: sm.IsMain.ToString(),
+                    ParentId: sm.ParentMenuId,
+                    Children: Array.Empty<MenuDTO>()
+                )).ToArray()
+                : Array.Empty<MenuDTO>()
+        ));
+
+        return new ApiResponse<IEnumerable<MenuDTO>>(true, null, menuDTOs);
     }
 
     public async Task<ApiResponse<MenuDTO>> UpdateMenuAsync(int id, MenuUpdate request)
     {
-        throw new NotImplementedException();
-    }
+        Menu? menu = await _menuRepository.GetByIdAsync(id);
+        if (menu == null)
+        {
+            return new ApiResponse<MenuDTO>(false, "Menu not found.", null);
+        }
 
-    public async Task<ApiResponse<IEnumerable<MenuDTO>>> GetAllMenusAsync(int userId)
-    {
-        throw new NotImplementedException();
+        menu.Name = request.Name;
+        menu.Url = request.Url;
+        menu.IsMain = request.IsMain;
+        menu.ParentMenuId = request.ParentId;
+        menu.MinimumHierarchy = request.MinHierarchy;
+
+        Menu? updatedMenu = await _menuRepository.UpdateAsync(menu);
+        if (updatedMenu == null)
+        {
+            return new ApiResponse<MenuDTO>(false, "Failed to update menu.", null);
+        }
+
+        MenuDTO response = new MenuDTO
+        (
+            IdMenu: updatedMenu.Id,
+            Name: updatedMenu.Name,
+            Route: updatedMenu.Url,
+            IsMain: updatedMenu.IsMain.ToString(),
+            ParentId: updatedMenu.ParentMenuId,
+            Children: Array.Empty<MenuDTO>()
+        );
+
+        return new ApiResponse<MenuDTO>(true, null, response);
     }
 }

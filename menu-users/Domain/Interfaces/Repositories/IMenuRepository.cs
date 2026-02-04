@@ -5,5 +5,5 @@ namespace menu_users.Domain.Interfaces.Repositories;
 
 public interface IMenuRepository : IRepository<Menu>
 {
-
+    Task<IEnumerable<Menu>> GetMenusByUserHierarchyAsync(int hierarchy);
 }

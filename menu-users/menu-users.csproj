@@ -32,6 +32,7 @@
     <Folder Include="Application/Mappings/" />
     <Folder Include="Controllers/" />
     <Folder Include="Controllers/Auth/" />
+    <Folder Include="Controllers/Menu/" />
     <Folder Include="Controllers/Role/" />
     <Folder Include="Infrastructure/" />
     <Folder Include="Infrastructure/Configurations/" />
