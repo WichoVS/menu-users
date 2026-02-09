@@ -483,3 +483,7 @@ $RECYCLE.BIN/
 
 
 obj/
+
+# Ignore build output folders
+[Oo]bj/
+[Bb]in/
