@@ -34,6 +34,7 @@
     <Folder Include="Controllers/Auth/" />
     <Folder Include="Controllers/Menu/" />
     <Folder Include="Controllers/Role/" />
+    <Folder Include="Controllers/User/" />
     <Folder Include="Infrastructure/" />
     <Folder Include="Infrastructure/Configurations/" />
     <Folder Include="Infrastructure/Data/" />

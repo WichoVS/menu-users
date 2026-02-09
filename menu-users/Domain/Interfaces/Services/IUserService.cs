@@ -9,8 +9,10 @@ public interface IUserService
 {
     Task<ApiResponse<IEnumerable<UserDTO>>> GetAllUsersAsync();
     Task<ApiResponse<UserDTO>> GetUserByIdAsync(string id);
-    Task<ApiResponse<UserDTO>> CreateUserAsync(SignInRequest request);
+    Task<ApiResponse<UserDTO>> CreateUserAsync(CreateUserRequest request);
     Task<ApiResponse<UserDTO>> UpdateUserAsync(string id, UpdateUserRequest request);
     Task<ApiResponse<bool>> DeleteUserAsync(string id);
+
+    Task<ApiResponse<GeneratedPasswordResponse>> UpdateUserPasswordAsync(string id);
 
 }

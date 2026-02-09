@@ -32,6 +32,7 @@ public class MenuRepository : IMenuRepository
 
         // Solo pasa a poner en activo = false, no eliminamos completamente
         menu.IsActive = false;
+        menu.UpdatedAt = DateTime.UtcNow;
         _context.Menus.Update(menu);
         await _context.SaveChangesAsync();
         return true;

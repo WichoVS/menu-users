@@ -6,5 +6,6 @@ public record class UserDTO
     string FirstName,
     string LastName,
     string Email,
+    string RoleName,
     int RoleId
 );

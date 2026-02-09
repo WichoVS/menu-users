@@ -70,7 +70,7 @@ public class AuthService : IAuthService
             return new AuthResult(false, "El correo electrónico ya está en uso", null);
         }
 
-        Role? role = await _roleRepository.GetByIdAsync(request.RoleId);
+        Role? role = await _roleRepository.GetLowestByHierarchyAsync();
         if (role == null || role.IsActive == false)
         {
             return new AuthResult(false, "Rol no válido", null);

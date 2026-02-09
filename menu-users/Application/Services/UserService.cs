@@ -13,14 +13,16 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IRoleRepository _roleRepository;
 
-    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _roleRepository = roleRepository;
     }
 
-    public async Task<ApiResponse<UserDTO>> CreateUserAsync(SignInRequest request)
+    public async Task<ApiResponse<UserDTO>> CreateUserAsync(CreateUserRequest request)
     {
         User? user = await _userRepository.GetByEmailAsync(request.Email);
 
@@ -29,7 +31,13 @@ public class UserService : IUserService
             return new ApiResponse<UserDTO>(false, "User with the same email already exists.", null);
         }
 
-        string hashedPassword = _passwordHasher.Hash(getRandomGeneratedPassword());
+        Role? role = await _roleRepository.GetByIdAsync(request.RoleId);
+        if (role == null)
+        {
+            return new ApiResponse<UserDTO>(false, "Role not found.", null);
+        }
+
+        string hashedPassword = _passwordHasher.Hash(GetRandomGeneratedPassword());
 
 
         User newUser = new User
@@ -51,6 +59,7 @@ public class UserService : IUserService
             createdUser.FirstName,
             createdUser.LastName,
             createdUser.Email,
+            role.Name,
             createdUser.RoleId
         );
 
@@ -80,6 +89,7 @@ public class UserService : IUserService
             user.FirstName,
             user.LastName,
             user.Email,
+            user.Role.Name,
             user.RoleId
         ));
 
@@ -99,6 +109,7 @@ public class UserService : IUserService
             user.FirstName,
             user.LastName,
             user.Email,
+            user.Role.Name,
             user.RoleId
         );
 
@@ -130,13 +141,14 @@ public class UserService : IUserService
             updatedUser.FirstName,
             updatedUser.LastName,
             updatedUser.Email,
+            updatedUser.Role.Name,
             updatedUser.RoleId
         );
 
         return new ApiResponse<UserDTO>(true, "User updated successfully.", userDTO);
     }
 
-    public string getRandomGeneratedPassword()
+    public string GetRandomGeneratedPassword()
     {
         // Genera una string aleatoria de 12 caracteres que incluya letras mayúsculas, minúsculas, números y símbolos
         const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -154,5 +166,29 @@ public class UserService : IUserService
         }
 
         return new string(password);
+    }
+
+    public async Task<ApiResponse<GeneratedPasswordResponse>> UpdateUserPasswordAsync(string id)
+    {
+        User? user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            return new ApiResponse<GeneratedPasswordResponse>(false, "User not found.", null);
+        }
+
+        string newGeneratedPassword = GetRandomGeneratedPassword();
+        string hashedPassword = _passwordHasher.Hash(newGeneratedPassword);
+        user.Password = hashedPassword;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        User? updatedUser = await _userRepository.UpdateAsync(user);
+        if (updatedUser == null)
+        {
+            return new ApiResponse<GeneratedPasswordResponse>(false, "Failed to update user password.", null);
+        }
+
+        GeneratedPasswordResponse gPassResponse = new GeneratedPasswordResponse(newGeneratedPassword);
+
+        return new ApiResponse<GeneratedPasswordResponse>(true, "User password updated successfully.", gPassResponse);
     }
 }

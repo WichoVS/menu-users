@@ -53,6 +53,14 @@ public class RoleRepository : IRoleRepository
         return await _context.Roles.FirstOrDefaultAsync(r => r.Name == name);
     }
 
+    public async Task<Role?> GetLowestByHierarchyAsync()
+    {
+        return await _context.Roles
+            .Where(r => r.IsActive == true)
+            .OrderBy(r => r.Hierarchy)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<Role?> UpdateAsync(Role entity)
     {
         Role? role = await _context.Roles.FindAsync(entity.Id);

@@ -44,7 +44,7 @@ namespace menu_users.Controllers.Role
             var result = await _roleService.GetAllRolesAsync();
             if (!result.Success)
             {
-                return BadRequest(new { message = result.Error });
+                return BadRequest(result);
             }
             return Ok(result.Data);
         }

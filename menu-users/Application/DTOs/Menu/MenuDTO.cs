@@ -4,8 +4,9 @@ public record class MenuDTO
 (
     int IdMenu,
     string Name,
-    string Route,
-    string IsMain,
+    string Url,
+    bool IsMain,
     int? ParentId,
+    int MinHierarchy,
     MenuDTO[] Children
 );

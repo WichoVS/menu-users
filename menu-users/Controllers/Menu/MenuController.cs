@@ -22,10 +22,10 @@ namespace menu_users.Controllers.Menu
             var result = await _menuService.GetMenuByUserIdAsync(userId);
             if (!result.Success)
             {
-                return BadRequest(result);
+                return BadRequest(new { message = result.Error });
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         // En este hay que verificar luego que el usuario sea jerarquía de superUser
@@ -35,10 +35,10 @@ namespace menu_users.Controllers.Menu
             var result = await _menuService.GetAllMenusAsync();
             if (!result.Success)
             {
-                return BadRequest(result);
+                return BadRequest(new { message = result.Error });
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         [HttpPost]
@@ -47,10 +47,10 @@ namespace menu_users.Controllers.Menu
             var result = await _menuService.CreateMenuAsync(request);
             if (!result.Success)
             {
-                return BadRequest(result);
+                return BadRequest(new { message = result.Error });
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         [HttpPut("{id}")]
@@ -59,11 +59,11 @@ namespace menu_users.Controllers.Menu
             var result = await _menuService.UpdateMenuAsync(id, request);
             if (!result.Success)
             {
-                return BadRequest(result);
+                return BadRequest(new { message = result.Error });
 
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         [HttpDelete("{id}")]
@@ -72,11 +72,11 @@ namespace menu_users.Controllers.Menu
             var result = await _menuService.DeleteMenuAsync(id);
             if (!result.Success)
             {
-                return BadRequest(result);
+                return BadRequest(new { message = result.Error });
 
             }
 
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }

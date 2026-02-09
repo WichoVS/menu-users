@@ -30,7 +30,10 @@ public class MenuService : IMenuService
             IsMain = request.IsMain,
             ParentMenuId = request.ParentId,
             Url = request.Url,
-            MinimumHierarchy = request.MinHierarchy
+            MinimumHierarchy = request.MinHierarchy,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         Menu createdMenu = await _menuRepository.AddAsync(newMenu);
@@ -39,9 +42,10 @@ public class MenuService : IMenuService
         (
             IdMenu: createdMenu.Id,
             Name: createdMenu.Name,
-            Route: createdMenu.Url,
-            IsMain: createdMenu.IsMain.ToString(),
+            Url: createdMenu.Url,
+            IsMain: createdMenu.IsMain,
             ParentId: createdMenu.ParentMenuId,
+            MinHierarchy: createdMenu.MinimumHierarchy,
             Children: Array.Empty<MenuDTO>()
         );
 
@@ -70,17 +74,19 @@ public class MenuService : IMenuService
         (
             IdMenu: m.Id,
             Name: m.Name,
-            Route: m.Url,
-            IsMain: m.IsMain.ToString(),
+            Url: m.Url,
+            IsMain: m.IsMain,
             ParentId: m.ParentMenuId,
+            MinHierarchy: m.MinimumHierarchy,
             Children: m.SubMenus != null
                 ? m.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
                 (
                     IdMenu: sm.Id,
                     Name: sm.Name,
-                    Route: sm.Url,
-                    IsMain: sm.IsMain.ToString(),
+                    Url: sm.Url,
+                    IsMain: sm.IsMain,
                     ParentId: sm.ParentMenuId,
+                    MinHierarchy: sm.MinimumHierarchy,
                     Children: Array.Empty<MenuDTO>()
                 )).ToArray()
                 : Array.Empty<MenuDTO>()
@@ -119,17 +125,19 @@ public class MenuService : IMenuService
         (
             IdMenu: m.Id,
             Name: m.Name,
-            Route: m.Url,
-            IsMain: m.IsMain.ToString(),
+            Url: m.Url,
+            IsMain: m.IsMain,
             ParentId: m.ParentMenuId,
+            MinHierarchy: m.MinimumHierarchy,
             Children: m.SubMenus != null
                 ? m.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
                 (
                     IdMenu: sm.Id,
                     Name: sm.Name,
-                    Route: sm.Url,
-                    IsMain: sm.IsMain.ToString(),
+                    Url: sm.Url,
+                    IsMain: sm.IsMain,
                     ParentId: sm.ParentMenuId,
+                    MinHierarchy: sm.MinimumHierarchy,
                     Children: Array.Empty<MenuDTO>()
                 )).ToArray()
                 : Array.Empty<MenuDTO>()
@@ -151,6 +159,7 @@ public class MenuService : IMenuService
         menu.IsMain = request.IsMain;
         menu.ParentMenuId = request.ParentId;
         menu.MinimumHierarchy = request.MinHierarchy;
+        menu.UpdatedAt = DateTime.UtcNow;
 
         Menu? updatedMenu = await _menuRepository.UpdateAsync(menu);
         if (updatedMenu == null)
@@ -162,9 +171,10 @@ public class MenuService : IMenuService
         (
             IdMenu: updatedMenu.Id,
             Name: updatedMenu.Name,
-            Route: updatedMenu.Url,
-            IsMain: updatedMenu.IsMain.ToString(),
+            Url: updatedMenu.Url,
+            IsMain: updatedMenu.IsMain,
             ParentId: updatedMenu.ParentMenuId,
+            MinHierarchy: updatedMenu.MinimumHierarchy,
             Children: Array.Empty<MenuDTO>()
         );
 
