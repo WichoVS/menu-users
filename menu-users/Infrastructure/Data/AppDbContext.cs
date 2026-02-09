@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Menu> Menus => Set<Menu>();
+    public DbSet<MenuToUser> MenuToUsers => Set<MenuToUser>();
 
 
     public AppDbContext(DbContextOptions<AppDbContext> options, IServiceProvider serviceProvider) : base(options)

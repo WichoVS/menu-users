@@ -25,4 +25,6 @@ public class Menu
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+    // Es la lista de los usuarios que tienen acceso a este menú
+    public ICollection<MenuToUser> MenuUsers { get; set; } = new List<MenuToUser>();
 }

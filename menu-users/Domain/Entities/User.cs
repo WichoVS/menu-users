@@ -23,4 +23,6 @@ public class User
     public DateTime UpdatedAt { get; set; }
 
     public bool IsActive { get; set; }
+    // Lista de los menus a los que el usuario tiene acceso
+    public ICollection<MenuToUser> UserMenus { get; set; } = new List<MenuToUser>();
 }
