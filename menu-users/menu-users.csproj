@@ -21,13 +21,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Application/DTOs/ApiResponse/" />
     <Folder Include="Application/DTOs/Auth/" />
+    <Folder Include="Application/DTOs/MenuToUser/" />
     <Folder Include="Application/DTOs/User/" />
     <Folder Include="Application/Mappings/" />
     <Folder Include="Controllers/" />

@@ -11,5 +11,8 @@ public interface IMenuService
     Task<ApiResponse<MenuDTO>> UpdateMenuAsync(int id, MenuUpdate request);
     Task<ApiResponse<bool>> DeleteMenuAsync(int id);
     Task<ApiResponse<IEnumerable<MenuDTO>>> GetAllMenusAsync();
+    Task<ApiResponse<MenuDTO>> GetMenuByIdAsync(int id);
+
+    Task<ApiResponse<IEnumerable<MenuDTO>>> GetMenusByHierarchyAsync(int hierarchy);
 
 }

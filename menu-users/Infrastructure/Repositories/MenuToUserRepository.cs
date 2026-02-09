@@ -1,4 +1,5 @@
 using System;
+using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
 using menu_users.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -44,10 +45,31 @@ public class MenuToUserRepository : IMenuToUserRepository
         return menuToUser;
     }
 
-    // Implementar este método para asignar los menús por defecto a un usuario según su jerarquía
-    public Task<IEnumerable<MenuToUser>> SetDefaultMenusByHierarchy(Guid userId)
+    public async Task<IEnumerable<MenuToUser>> GetMenusByUserIdAsync(Guid userId)
     {
+        return await _context.MenuToUsers.Where(mtU => mtU.UserId == userId).Include(mtU => mtU.Menu).ToListAsync();
+    }
 
+    // Implementar este método para asignar los menús por defecto a un usuario según su jerarquía
+    public async Task<IEnumerable<MenuToUser>> SetDefaultMenusByHierarchyAsync(Guid userId, IEnumerable<Menu> menus)
+    {
+        List<MenuToUser> menuToUsers = new List<MenuToUser>();
+
+        foreach (var menu in menus)
+        {
+            MenuToUser menuToUser = new MenuToUser
+            {
+                UserId = userId,
+                MenuId = menu.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+            menuToUsers.Add(menuToUser);
+        }
+
+        await _context.MenuToUsers.AddRangeAsync(menuToUsers);
+        await _context.SaveChangesAsync();
+
+        return menuToUsers.AsEnumerable();
     }
 
     // Este método no es necesario implementarlo, ya que no se actualizan solo se asignan o eliminan los menús a los usuarios.

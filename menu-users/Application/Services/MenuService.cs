@@ -95,6 +95,39 @@ public class MenuService : IMenuService
         return new ApiResponse<IEnumerable<MenuDTO>>(true, null, menuDTOs);
     }
 
+    public async Task<ApiResponse<MenuDTO>> GetMenuByIdAsync(int id)
+    {
+        Menu? menu = await _menuRepository.GetByIdAsync(id);
+        if (menu == null)
+        {
+            return new ApiResponse<MenuDTO>(false, "Menu not found.", null);
+        }
+
+        MenuDTO response = new MenuDTO
+        (
+            IdMenu: menu.Id,
+            Name: menu.Name,
+            Url: menu.Url,
+            IsMain: menu.IsMain,
+            ParentId: menu.ParentMenuId,
+            MinHierarchy: menu.MinimumHierarchy,
+            Children: menu.SubMenus != null
+                ? menu.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
+                (
+                    IdMenu: sm.Id,
+                    Name: sm.Name,
+                    Url: sm.Url,
+                    IsMain: sm.IsMain,
+                    ParentId: sm.ParentMenuId,
+                    MinHierarchy: sm.MinimumHierarchy,
+                    Children: Array.Empty<MenuDTO>()
+                )).ToArray()
+                : Array.Empty<MenuDTO>()
+        );
+
+        return new ApiResponse<MenuDTO>(true, null, response);
+    }
+
     public async Task<ApiResponse<IEnumerable<MenuDTO>>> GetMenuByUserIdAsync(string userId)
     {
         ApiResponse<UserDTO> user = await _userService.GetUserByIdAsync(userId);
@@ -120,6 +153,35 @@ public class MenuService : IMenuService
         }
 
         IEnumerable<Menu> menus = await _menuRepository.GetMenusByUserHierarchyAsync(role.Data.Hierarchy);
+
+        var menuDTOs = menus.Select(m => new MenuDTO
+        (
+            IdMenu: m.Id,
+            Name: m.Name,
+            Url: m.Url,
+            IsMain: m.IsMain,
+            ParentId: m.ParentMenuId,
+            MinHierarchy: m.MinimumHierarchy,
+            Children: m.SubMenus != null
+                ? m.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
+                (
+                    IdMenu: sm.Id,
+                    Name: sm.Name,
+                    Url: sm.Url,
+                    IsMain: sm.IsMain,
+                    ParentId: sm.ParentMenuId,
+                    MinHierarchy: sm.MinimumHierarchy,
+                    Children: Array.Empty<MenuDTO>()
+                )).ToArray()
+                : Array.Empty<MenuDTO>()
+        ));
+
+        return new ApiResponse<IEnumerable<MenuDTO>>(true, null, menuDTOs);
+    }
+
+    public async Task<ApiResponse<IEnumerable<MenuDTO>>> GetMenusByHierarchyAsync(int hierarchy)
+    {
+        IEnumerable<Menu> menus = await _menuRepository.GetMenusByUserHierarchyAsync(hierarchy);
 
         var menuDTOs = menus.Select(m => new MenuDTO
         (
