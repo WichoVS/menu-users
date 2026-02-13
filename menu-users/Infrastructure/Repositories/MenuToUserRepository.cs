@@ -50,6 +50,14 @@ public class MenuToUserRepository : IMenuToUserRepository
         return await _context.MenuToUsers.Where(mtU => mtU.UserId == userId).Include(mtU => mtU.Menu).ToListAsync();
     }
 
+    public async Task<bool> DeleteAllMenusFromUserAsync(Guid userId)
+    {
+        var menusToDelete = _context.MenuToUsers.Where(mtU => mtU.UserId == userId);
+        _context.MenuToUsers.RemoveRange(menusToDelete);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     // Implementar este método para asignar los menús por defecto a un usuario según su jerarquía
     public async Task<IEnumerable<MenuToUser>> SetDefaultMenusByHierarchyAsync(Guid userId, IEnumerable<Menu> menus)
     {

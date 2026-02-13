@@ -14,17 +14,20 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IRoleRepository _roleRepository;
     private readonly ITokenService _tokenService;
+    private readonly IMenuToUserService _menuToUserService;
 
     public AuthService(
         IPasswordHasher passwordHasher,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IMenuToUserService menuToUserService)
     {
         _passwordHasher = passwordHasher;
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _tokenService = tokenService;
+        _menuToUserService = menuToUserService;
     }
 
     public async Task<AuthResult> LoginAsync(LoginRequest request)
@@ -91,6 +94,8 @@ public class AuthService : IAuthService
         };
 
         await _userRepository.AddAsync(newUser);
+
+        await _menuToUserService.SetDefaultMenusByHierarchyAsync(newUser.Id);
 
         var token = _tokenService.GenerateToken(newUser, role);
 

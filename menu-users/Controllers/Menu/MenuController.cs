@@ -10,16 +10,18 @@ namespace menu_users.Controllers.Menu
     public class MenuController : ControllerBase
     {
         private readonly IMenuService _menuService;
+        private readonly IMenuToUserService _menuToUserService;
 
-        public MenuController(IMenuService menuService)
+        public MenuController(IMenuService menuService, IMenuToUserService menuToUserService)
         {
             _menuService = menuService;
+            _menuToUserService = menuToUserService;
         }
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetMenuByUserIdAsync([FromRoute] string userId)
         {
-            var result = await _menuService.GetMenuByUserIdAsync(userId);
+            var result = await _menuToUserService.GetMenusByUserIdAsync(Guid.Parse(userId));
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -74,6 +76,30 @@ namespace menu_users.Controllers.Menu
             {
                 return BadRequest(new { message = result.Error });
 
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpPut("{userId}/set-default-menus")]
+        public async Task<IActionResult> SetDefaultMenusByHierarchyAsync([FromRoute] Guid userId)
+        {
+            var result = await _menuToUserService.SetDefaultMenusByHierarchyAsync(userId);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Error });
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpPost("{userId}/add-menu/{menuId}")]
+        public async Task<IActionResult> AddMenuToUserAsync([FromRoute] Guid userId, [FromRoute] int menuId)
+        {
+            var result = await _menuToUserService.AddMenuToUserAsync(userId, menuId);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Error });
             }
 
             return Ok(result.Data);

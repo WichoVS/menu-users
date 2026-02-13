@@ -8,4 +8,5 @@ public interface IMenuToUserRepository : IRepository<MenuToUser>
 {
     Task<IEnumerable<MenuToUser>> SetDefaultMenusByHierarchyAsync(Guid userId, IEnumerable<Menu> menus);
     Task<IEnumerable<MenuToUser>> GetMenusByUserIdAsync(Guid userId);
+    Task<bool> DeleteAllMenusFromUserAsync(Guid userId);
 }

@@ -191,7 +191,7 @@ public class MenuService : IMenuService
             IsMain: m.IsMain,
             ParentId: m.ParentMenuId,
             MinHierarchy: m.MinimumHierarchy,
-            Children: m.SubMenus != null
+            Children: m.SubMenus.Count > 0
                 ? m.SubMenus.Where(sm => sm.IsActive).Select(sm => new MenuDTO
                 (
                     IdMenu: sm.Id,

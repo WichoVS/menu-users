@@ -2,6 +2,7 @@ using System;
 using menu_users.Application.DTOs.ApiResponse;
 using menu_users.Application.DTOs.Menu;
 using menu_users.Application.DTOs.MenuToUser;
+using menu_users.Application.DTOs.Role;
 using menu_users.Application.DTOs.User;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Repositories;
@@ -14,33 +15,40 @@ public class MenuToUserService : IMenuToUserService
     private readonly IMenuToUserRepository _menuToUserRepository;
     private readonly IMenuService _menuService;
     private readonly IUserService _userService;
+    private readonly IRoleService _roleService;
 
-    public MenuToUserService(IMenuToUserRepository menuToUserRepository, IMenuService menuService, IUserService userService)
+    public MenuToUserService(IMenuToUserRepository menuToUserRepository, IMenuService menuService, IUserService userService, IRoleService roleService)
     {
         _menuToUserRepository = menuToUserRepository;
         _menuService = menuService;
         _userService = userService;
+        _roleService = roleService;
     }
 
-    public async Task<ApiResponse<MenuToUserDTO?>> AddMenuToUserAsync(MenuToUser menuToUser)
+    public async Task<ApiResponse<MenuToUserDTO?>> AddMenuToUserAsync(Guid userId, int menuId)
     {
-        ApiResponse<UserDTO> user = await _userService.GetUserByIdAsync(menuToUser.UserId.ToString());
+        ApiResponse<UserDTO> user = await _userService.GetUserByIdAsync(userId.ToString());
         if (!user.Success)
         {
             return new ApiResponse<MenuToUserDTO?>(false, user.Error, null);
         }
 
-        ApiResponse<MenuDTO> menu = await _menuService.GetMenuByIdAsync(menuToUser.MenuId);
+        ApiResponse<MenuDTO> menu = await _menuService.GetMenuByIdAsync(menuId);
         if (!menu.Success)
         {
             return new ApiResponse<MenuToUserDTO?>(false, "Menu not found", null);
         }
 
-        menuToUser.CreatedAt = DateTime.UtcNow;
+        MenuToUser menuToUser = new MenuToUser
+        {
+            UserId = userId,
+            MenuId = menuId,
+            CreatedAt = DateTime.UtcNow
+        };
+
         MenuToUser addedMenuToUser = await _menuToUserRepository.AddAsync(menuToUser);
         MenuToUserDTO menuToUserDTO = new MenuToUserDTO
         (
-            IdMenuToUser: addedMenuToUser.Id,
             UserId: addedMenuToUser.UserId,
             Menu:
             [
@@ -60,33 +68,37 @@ public class MenuToUserService : IMenuToUserService
         return new ApiResponse<MenuToUserDTO?>(true, "Menu assigned to user successfully", menuToUserDTO);
     }
 
-    public async Task<ApiResponse<IEnumerable<MenuToUserDTO>>> GetMenusByUserIdAsync(Guid userId)
+    public async Task<ApiResponse<MenuToUserDTO>> GetMenusByUserIdAsync(Guid userId)
     {
-        // Obtener los menús asignados a un usuario específico y agruparlos con su padre, si no tiene acceso a padre pero si al hijo,
-        // no se cuenta y se omite
-
         IEnumerable<MenuToUser> menus = await _menuToUserRepository.GetMenusByUserIdAsync(userId);
 
+        List<MenuDTO> menuDTOs = new List<MenuDTO>();
 
-        IEnumerable<MenuToUserDTO> menuDTOs = menus.Select(m => new MenuToUserDTO
-        (
-            IdMenuToUser: m.Id,
-            UserId: m.UserId,
-            Menu:
-            [
-                new MenuDTO
-                (
-                    IdMenu: m.Menu.Id,
-                    Name: m.Menu.Name,
-                    Url: m.Menu.Url,
-                    IsMain: m.Menu.IsMain,
-                    ParentId: m.Menu.ParentMenuId,
-                    MinHierarchy: m.Menu.MinimumHierarchy,
-                    Children: Array.Empty<MenuDTO>()
-                )
-            ]
-        )).ToArray();
-        return new ApiResponse<IEnumerable<MenuToUserDTO>>(true, "Menus retrieved successfully", menuDTOs);
+        foreach (var menu in menus)
+        {
+            menuDTOs.Add(new MenuDTO
+            (
+                IdMenu: menu.Menu.Id,
+                Name: menu.Menu.Name,
+                Url: menu.Menu.Url,
+                IsMain: menu.Menu.IsMain,
+                ParentId: menu.Menu.ParentMenuId,
+                MinHierarchy: menu.Menu.MinimumHierarchy,
+                Children: Array.Empty<MenuDTO>()
+            ));
+        }
+
+        MenuToUserDTO groupedMenus = new MenuToUserDTO(
+                UserId: userId,
+                Menu: GetGroupedMenus(menuDTOs).ToArray()
+        );
+
+        return new ApiResponse<MenuToUserDTO>(true, "Menus retrieved successfully", groupedMenus);
+    }
+
+    public Task<ApiResponse<bool>> RemoveAllMenusFromUserAsync(Guid userId)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<ApiResponse<bool>> RemoveMenuFromUserAsync(Guid userId, int menuId)
@@ -104,10 +116,148 @@ public class MenuToUserService : IMenuToUserService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<MenuToUserDTO>>> SetDefaultMenusByHierarchyAsync(Guid userId, IEnumerable<Menu> menus)
+    public async Task<ApiResponse<MenuToUserDTO>> SetDefaultMenusByHierarchyAsync(Guid userId)
     {
+        // Verificamos que el user existe
+        ApiResponse<UserDTO> user = await _userService.GetUserByIdAsync(userId.ToString());
+        if (!user.Success)
+        {
+            return new ApiResponse<MenuToUserDTO>(false, user.Error, null);
+        }
+
+        // Obtenemos todos los roles para verificar el rol del usuario
+        ApiResponse<IEnumerable<RoleResponse>> roleRes = await _roleService.GetAllRolesAsync();
+        if (!roleRes.Success)
+        {
+            return new ApiResponse<MenuToUserDTO>(false, user.Error, null);
+        }
+
+        // Verificamos el Role del Usuario
+        RoleResponse? roleUser = roleRes.Data!.FirstOrDefault(r => r.Id == user.Data!.RoleId);
+        if (roleUser == null)
+        {
+            return new ApiResponse<MenuToUserDTO>(false, "Role not valid", null);
+        }
+
+        // Como esta funcion es para setear los menus por defecto del usuario según su jerarquía,
+        // primero eliminamos todos los menus asignados al usuario
+        bool deleteMenusResult = await _menuToUserRepository.DeleteAllMenusFromUserAsync(userId);
+        if (!deleteMenusResult)
+        {
+            return new ApiResponse<MenuToUserDTO>(false, "Failed to delete menus", null);
+        }
+
+        // Ahora obtenemos todos los menus a los que el rol del usuario tiene acceso
+        ApiResponse<IEnumerable<MenuDTO>> accessibleMenus = await _menuService.GetMenusByHierarchyAsync(roleUser.Hierarchy);
+        if (!accessibleMenus.Success)
+        {
+            return new ApiResponse<MenuToUserDTO>(false, accessibleMenus.Error, null);
+        }
 
 
-        await _menuService.GetMenusByHierarchyAsync(userId, menus);
+        // Flatten la lista de menús y submenús para asignarlos al usuario
+        List<Menu> menusToAssign = new List<Menu>();
+
+        foreach (var menu in accessibleMenus.Data!)
+        {
+            Menu menuToAssign = new Menu
+            {
+                Id = menu.IdMenu,
+                Name = menu.Name,
+                Url = menu.Url,
+                IsMain = menu.IsMain,
+                ParentMenuId = menu.ParentId,
+                MinimumHierarchy = menu.MinHierarchy
+            };
+
+            menusToAssign.Add(menuToAssign);
+
+            if (menu.Children != null && menu.Children.Any())
+            {
+                foreach (var subMenu in menu.Children)
+                {
+                    Menu subMenuToAssign = new Menu
+                    {
+                        Id = subMenu.IdMenu,
+                        Name = subMenu.Name,
+                        Url = subMenu.Url,
+                        IsMain = subMenu.IsMain,
+                        ParentMenuId = subMenu.ParentId,
+                        MinimumHierarchy = subMenu.MinHierarchy
+                    };
+
+                    menusToAssign.Add(subMenuToAssign);
+                }
+            }
+        }
+
+        IEnumerable<MenuToUser> assignedMenus = await _menuToUserRepository.SetDefaultMenusByHierarchyAsync(userId, menusToAssign);
+
+        List<MenuDTO> menuDTOs = new List<MenuDTO>();
+        foreach (var menu in assignedMenus)
+        {
+            menuDTOs.Add(new MenuDTO
+            (
+                IdMenu: menu.Menu.Id,
+                Name: menu.Menu.Name,
+                Url: menu.Menu.Url,
+                IsMain: menu.Menu.IsMain,
+                ParentId: menu.Menu.ParentMenuId,
+                MinHierarchy: menu.Menu.MinimumHierarchy,
+                Children: Array.Empty<MenuDTO>()
+            ));
+        }
+
+        MenuToUserDTO groupedMenus = new MenuToUserDTO(
+                UserId: userId,
+                Menu: menuDTOs.ToArray()
+        );
+
+        return new ApiResponse<MenuToUserDTO>(true, "Default menus set successfully", groupedMenus);
+    }
+
+
+    private List<MenuDTO> GetGroupedMenus(List<MenuDTO> menusToGroup)
+    {
+        List<MenuDTO> parentMenus = new List<MenuDTO>();
+        List<MenuDTO> childMenus = new List<MenuDTO>();
+        List<MenuDTO> groupedMenus = new List<MenuDTO>();
+
+
+        foreach (var menu in menusToGroup)
+        {
+            if (menu.ParentId == null)
+            {
+                parentMenus.Add(menu);
+            }
+            else
+            {
+                childMenus.Add(menu);
+            }
+        }
+        // Ahora agrupamos los menús hijos dentro de su menú padre correspondiente
+        var childrenGrouped = childMenus.GroupBy(c => c.ParentId);
+
+
+        foreach (var parentMenu in parentMenus)
+        {
+            var children = childrenGrouped.FirstOrDefault(g => g.Key == parentMenu.IdMenu)?.ToList() ?? new List<MenuDTO>();
+
+            MenuDTO groupedMenu = new MenuDTO
+            (
+                IdMenu: parentMenu.IdMenu,
+                Name: parentMenu.Name,
+                Url: parentMenu.Url,
+                IsMain: parentMenu.IsMain,
+                ParentId: parentMenu.ParentId,
+                MinHierarchy: parentMenu.MinHierarchy,
+                Children: children.ToArray()
+            );
+
+
+            groupedMenus.Add(groupedMenu);
+        }
+
+        return groupedMenus;
     }
 }
