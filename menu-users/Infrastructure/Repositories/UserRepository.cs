@@ -64,6 +64,7 @@ public class UserRepository : IUserRepository
 
         _context.Users.Update(usr);
         await _context.SaveChangesAsync();
+        await _context.Entry(usr).Reference(u => u.Role).LoadAsync();
         return usr;
     }
 

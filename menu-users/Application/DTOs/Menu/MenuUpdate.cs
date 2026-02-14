@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Menu;
 
-public record class MenuUpdate
+public record MenuUpdate
 (
     string Name,
     bool IsMain,

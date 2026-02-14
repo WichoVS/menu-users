@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.User;
 
-public record class UserDTO
+public record UserDTO
 (
     string Id,
     string FirstName,

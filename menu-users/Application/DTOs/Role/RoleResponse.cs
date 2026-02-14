@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Role;
 
-public record class RoleResponse
+public record RoleResponse
 (
     int Id,
     string Name,

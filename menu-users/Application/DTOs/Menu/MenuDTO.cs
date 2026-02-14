@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Menu;
 
-public record class MenuDTO
+public record MenuDTO
 (
     int IdMenu,
     string Name,

@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Role;
 
-public record class RoleCreateRequest
+public record RoleCreateRequest
 (
     string Name,
     int Hierarchy

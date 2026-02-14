@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Menu;
 
-public record class CreateMenu
+public record CreateMenu
 (
     string Name,
     bool IsMain,

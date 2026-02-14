@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.ApiResponse;
 
-public record class ApiResponse<T>
+public record ApiResponse<T>
 (
     bool Success,
     string? Error,
