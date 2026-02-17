@@ -11,6 +11,11 @@ using menu_users.Application.Features.Menus.GetMenusByHierarchyUseCase;
 using menu_users.Application.Features.Menus.GetMenusByUserIdUseCase;
 using menu_users.Application.Features.Menus.RemoveMenuToUserUseCase;
 using menu_users.Application.Features.Menus.UpdateMenuUseCase;
+using menu_users.Application.Features.Roles.CreateRoleUseCase;
+using menu_users.Application.Features.Roles.DeleteRoleUseCase;
+using menu_users.Application.Features.Roles.GetAllRolesUseCase;
+using menu_users.Application.Features.Roles.GetRoleByIdUseCase;
+using menu_users.Application.Features.Roles.UpdateRoleUseCase;
 using menu_users.Application.Features.Users.CreateUserUseCase;
 using menu_users.Application.Features.Users.GeneratePasswordUseCase;
 using menu_users.Application.Features.Users.GetAllUsersUseCase;
@@ -21,6 +26,7 @@ using menu_users.Application.Features.Users.UpdateUserUseCase;
 using menu_users.Application.Services;
 using menu_users.Domain.Interfaces.Features.Auth;
 using menu_users.Domain.Interfaces.Features.Menus;
+using menu_users.Domain.Interfaces.Features.Roles;
 using menu_users.Domain.Interfaces.Features.User;
 using menu_users.Domain.Interfaces.Repositories;
 using menu_users.Domain.Interfaces.Services;
@@ -38,8 +44,6 @@ var db = builder.Configuration.GetSection("db");
 //Servicios
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IMenuToUserService, MenuToUserService>();
 
 //Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -71,6 +75,13 @@ builder.Services.AddScoped<IDeleteMenuUseCase, DeleteMenuUseCase>();
 builder.Services.AddScoped<IAssignDefaultMenusToUserUseCase, AssignDefaultMenusToUserUseCase>();
 builder.Services.AddScoped<IAssignMenuToUserUseCase, AssignMenuToUserUseCase>();
 builder.Services.AddScoped<IRemoveMenuToUserUseCase, RemoveMenuToUserUseCase>();
+
+//UseCases - Roles
+builder.Services.AddScoped<IGetAllRolesUseCase, GetAllRolesUseCase>();
+builder.Services.AddScoped<IGetRoleByIdUseCase, GetRoleByIdUseCase>();
+builder.Services.AddScoped<IUpdateRoleUseCase, UpdateRoleUseCase>();
+builder.Services.AddScoped<IDeleteRoleUseCase, DeleteRoleUseCase>();
+builder.Services.AddScoped<ICreateRoleUseCase, CreateRoleUseCase>();
 
 //DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>

@@ -37,6 +37,12 @@
     <Folder Include="Application/Features/Menus/GetMenusByUserIdUseCase/" />
     <Folder Include="Application/Features/Menus/RemoveMenuToUserUseCase/" />
     <Folder Include="Application/Features/Menus/UpdateMenuUseCase/" />
+    <Folder Include="Application/Features/Roles/" />
+    <Folder Include="Application/Features/Roles/CreateRoleUseCase/" />
+    <Folder Include="Application/Features/Roles/DeleteRoleUseCase/" />
+    <Folder Include="Application/Features/Roles/GetAllRolesUseCase/" />
+    <Folder Include="Application/Features/Roles/GetRoleByIdUseCase/" />
+    <Folder Include="Application/Features/Roles/UpdateRoleUseCase/" />
     <Folder Include="Application/Features/Users/" />
     <Folder Include="Application/Features/Users/GeneratePasswordUseCase/" />
     <Folder Include="Application/Features/Users/GetAllUsersUseCase/" />
@@ -51,6 +57,7 @@
     <Folder Include="Controllers/Role/" />
     <Folder Include="Controllers/User/" />
     <Folder Include="Domain/Interfaces/Features/Auth/" />
+    <Folder Include="Domain/Interfaces/Features/Roles/" />
     <Folder Include="Domain/Interfaces/Features/Users/" />
     <Folder Include="Infrastructure/" />
     <Folder Include="Infrastructure/Configurations/" />
