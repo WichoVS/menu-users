@@ -28,6 +28,15 @@
     <Folder Include="Application/DTOs/Auth/" />
     <Folder Include="Application/DTOs/MenuToUser/" />
     <Folder Include="Application/DTOs/User/" />
+    <Folder Include="Application/Features/Menus/AssignDefaultMenusToUserUseCase/" />
+    <Folder Include="Application/Features/Menus/CreateMenuUseCase/" />
+    <Folder Include="Application/Features/Menus/DeleteMenuUseCase/" />
+    <Folder Include="Application/Features/Menus/GetAllMenusUseCase/" />
+    <Folder Include="Application/Features/Menus/GetMenuByIdUseCase/" />
+    <Folder Include="Application/Features/Menus/GetMenusByHierarchyUseCase/" />
+    <Folder Include="Application/Features/Menus/GetMenusByUserIdUseCase/" />
+    <Folder Include="Application/Features/Menus/RemoveMenuToUserUseCase/" />
+    <Folder Include="Application/Features/Menus/UpdateMenuUseCase/" />
     <Folder Include="Application/Features/Users/" />
     <Folder Include="Application/Features/Users/GeneratePasswordUseCase/" />
     <Folder Include="Application/Features/Users/GetAllUsersUseCase/" />
@@ -41,9 +50,8 @@
     <Folder Include="Controllers/Menu/" />
     <Folder Include="Controllers/Role/" />
     <Folder Include="Controllers/User/" />
-    <Folder Include="Domain/Interfaces/Features/" />
     <Folder Include="Domain/Interfaces/Features/Auth/" />
-    <Folder Include="Domain/Interfaces/Features/User/" />
+    <Folder Include="Domain/Interfaces/Features/Users/" />
     <Folder Include="Infrastructure/" />
     <Folder Include="Infrastructure/Configurations/" />
     <Folder Include="Infrastructure/Data/" />

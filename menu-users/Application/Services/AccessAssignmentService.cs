@@ -59,7 +59,6 @@ public class AccessAssignmentService : IAccessAssignmentService
 
         return assignedMenus;
     }
-
     private List<MenuDTO> GetGroupedMenus(List<MenuDTO> menusToGroup)
     {
         List<MenuDTO> parentMenus = new List<MenuDTO>();

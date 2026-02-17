@@ -1,4 +1,7 @@
 using menu_users.Application.DTOs.Menu;
+using menu_users.Application.Features.Menus.CreateMenuUseCase;
+using menu_users.Application.Features.Menus.UpdateMenuUseCase;
+using menu_users.Domain.Interfaces.Features.Menus;
 using menu_users.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +12,39 @@ namespace menu_users.Controllers.Menu
     [ApiController]
     public class MenuController : ControllerBase
     {
-        private readonly IMenuService _menuService;
-        private readonly IMenuToUserService _menuToUserService;
+        private readonly IGetMenusByUserIdUseCase _getMenusByUserIdUseCase;
+        private readonly IGetAllMenusUseCase _getAllMenusUseCase;
+        private readonly ICreateMenuUseCase _createMenuUseCase;
+        private readonly IUpdateMenuUseCase _updateMenuUseCase;
+        private readonly IDeleteMenuUseCase _deleteMenuUseCase;
+        private readonly IAssignDefaultMenusToUserUseCase _assignDefaultMenusToUserUseCase;
+        private readonly IAssignMenuToUserUseCase _assignMenuToUserUseCase;
+        private readonly IRemoveMenuToUserUseCase _removeMenuToUserUseCase;
 
-        public MenuController(IMenuService menuService, IMenuToUserService menuToUserService)
+        public MenuController(
+            IGetMenusByUserIdUseCase getMenusByUserIdUseCase,
+            IGetAllMenusUseCase getAllMenusUseCase,
+            ICreateMenuUseCase createMenuUseCase,
+            IUpdateMenuUseCase updateMenuUseCase,
+            IDeleteMenuUseCase deleteMenuUseCase,
+            IAssignDefaultMenusToUserUseCase assignDefaultMenusToUserUseCase,
+            IAssignMenuToUserUseCase assignMenuToUserUseCase,
+            IRemoveMenuToUserUseCase removeMenuToUserUseCase)
         {
-            _menuService = menuService;
-            _menuToUserService = menuToUserService;
+            _getMenusByUserIdUseCase = getMenusByUserIdUseCase;
+            _getAllMenusUseCase = getAllMenusUseCase;
+            _createMenuUseCase = createMenuUseCase;
+            _updateMenuUseCase = updateMenuUseCase;
+            _deleteMenuUseCase = deleteMenuUseCase;
+            _assignDefaultMenusToUserUseCase = assignDefaultMenusToUserUseCase;
+            _assignMenuToUserUseCase = assignMenuToUserUseCase;
+            _removeMenuToUserUseCase = removeMenuToUserUseCase;
         }
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetMenuByUserIdAsync([FromRoute] string userId)
         {
-            var result = await _menuToUserService.GetMenusByUserIdAsync(Guid.Parse(userId));
+            var result = await _getMenusByUserIdUseCase.Execute(userId);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -34,7 +57,7 @@ namespace menu_users.Controllers.Menu
         [HttpGet]
         public async Task<IActionResult> GetAllMenusAsync()
         {
-            var result = await _menuService.GetAllMenusAsync();
+            var result = await _getAllMenusUseCase.Execute();
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -44,9 +67,9 @@ namespace menu_users.Controllers.Menu
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMenuAsync([FromBody] CreateMenu request)
+        public async Task<IActionResult> CreateMenuAsync([FromBody] CreateMenuRequest request)
         {
-            var result = await _menuService.CreateMenuAsync(request);
+            var result = await _createMenuUseCase.Execute(request);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -56,9 +79,9 @@ namespace menu_users.Controllers.Menu
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMenuAsync([FromRoute] int id, [FromBody] MenuUpdate request)
+        public async Task<IActionResult> UpdateMenuAsync([FromRoute] int id, [FromBody] UpdateMenuRequest request)
         {
-            var result = await _menuService.UpdateMenuAsync(id, request);
+            var result = await _updateMenuUseCase.Execute(id, request);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -71,7 +94,7 @@ namespace menu_users.Controllers.Menu
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMenuAsync([FromRoute] int id)
         {
-            var result = await _menuService.DeleteMenuAsync(id);
+            var result = await _deleteMenuUseCase.Execute(id);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -84,7 +107,7 @@ namespace menu_users.Controllers.Menu
         [HttpPut("{userId}/set-default-menus")]
         public async Task<IActionResult> SetDefaultMenusByHierarchyAsync([FromRoute] Guid userId)
         {
-            var result = await _menuToUserService.SetDefaultMenusByHierarchyAsync(userId);
+            var result = await _assignDefaultMenusToUserUseCase.Execute(userId);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -96,7 +119,7 @@ namespace menu_users.Controllers.Menu
         [HttpPost("{userId}/add-menu/{menuId}")]
         public async Task<IActionResult> AddMenuToUserAsync([FromRoute] Guid userId, [FromRoute] int menuId)
         {
-            var result = await _menuToUserService.AddMenuToUserAsync(userId, menuId);
+            var result = await _assignMenuToUserUseCase.Execute(userId, menuId);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
@@ -108,7 +131,7 @@ namespace menu_users.Controllers.Menu
         [HttpDelete("{userId}/remove-menu/{menuId}")]
         public async Task<IActionResult> RemoveMenuFromUserAsync([FromRoute] Guid userId, [FromRoute] int menuId)
         {
-            var result = await _menuToUserService.RemoveMenuFromUserAsync(userId, menuId);
+            var result = await _removeMenuToUserUseCase.Execute(userId, menuId);
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Error });
