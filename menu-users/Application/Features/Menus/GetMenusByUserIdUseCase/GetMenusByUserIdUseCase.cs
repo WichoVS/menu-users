@@ -1,6 +1,7 @@
 using System;
 using menu_users.Application.DTOs.ApiResponse;
 using menu_users.Application.DTOs.Menu;
+using menu_users.Application.DTOs.MenuToUser;
 using menu_users.Domain.Entities;
 using menu_users.Domain.Interfaces.Features.Menus;
 using menu_users.Domain.Interfaces.Repositories;
@@ -20,18 +21,18 @@ public class GetMenusByUserIdUseCase : IGetMenusByUserIdUseCase
         _roleRepository = roleRepository;
     }
 
-    public async Task<ApiResponse<IEnumerable<MenuDTO>>> Execute(string userId)
+    public async Task<ApiResponse<MenuToUserDTO>> Execute(string userId)
     {
         User? user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
         {
-            return new ApiResponse<IEnumerable<MenuDTO>>(false, "User not found.", null);
+            return new ApiResponse<MenuToUserDTO>(false, "User not found.", null);
         }
 
         Role? role = await _roleRepository.GetByIdAsync(user.RoleId);
         if (role == null)
         {
-            return new ApiResponse<IEnumerable<MenuDTO>>(false, "Role not found.", null);
+            return new ApiResponse<MenuToUserDTO>(false, "Role not found.", null);
         }
 
         IEnumerable<Menu> menus = await _menuRepository.GetMenusByUserHierarchyAsync(role.Hierarchy);
@@ -58,7 +59,9 @@ public class GetMenusByUserIdUseCase : IGetMenusByUserIdUseCase
                 : Array.Empty<MenuDTO>()
         ));
 
-        return new ApiResponse<IEnumerable<MenuDTO>>(true, null, menuDTOs);
+        var menuToUserDTO = new MenuToUserDTO(user.Id, menuDTOs.ToArray());
+
+        return new ApiResponse<MenuToUserDTO>(true, null, menuToUserDTO);
 
     }
 }

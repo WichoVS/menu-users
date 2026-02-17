@@ -44,6 +44,7 @@ var db = builder.Configuration.GetSection("db");
 //Servicios
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddScoped<IAccessAssignmentService, AccessAssignmentService>();
 
 //Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
