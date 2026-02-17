@@ -1,6 +1,6 @@
 namespace menu_users.Application.DTOs.Auth;
 
-public record LoginRequest
+public record LoginUserRequest
 (
     string Email,
     string Password

@@ -104,5 +104,16 @@ namespace menu_users.Controllers.Menu
 
             return Ok(result.Data);
         }
+
+        [HttpDelete("{userId}/remove-menu/{menuId}")]
+        public async Task<IActionResult> RemoveMenuFromUserAsync([FromRoute] Guid userId, [FromRoute] int menuId)
+        {
+            var result = await _menuToUserService.RemoveMenuFromUserAsync(userId, menuId);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Error });
+            }
+            return Ok(result.Data);
+        }
     }
 }

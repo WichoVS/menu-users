@@ -15,7 +15,9 @@ public class MenuService : IMenuService
     private readonly IUserService _userService;
     private readonly IRoleService _roleService;
 
-    public MenuService(IMenuRepository menuRepository, IUserService userService, IRoleService roleService)
+    public MenuService(IMenuRepository menuRepository,
+    IUserService userService,
+    IRoleService roleService)
     {
         _menuRepository = menuRepository;
         _userService = userService;
@@ -70,7 +72,7 @@ public class MenuService : IMenuService
         IEnumerable<Menu> menus = await _menuRepository.GetAllAsync();
 
         // Por ahora se tiene pensado menu de dos niveles
-        var menuDTOs = menus.Select(m => new MenuDTO
+        var menuDTOs = menus.Where(m => m.IsMain).Select(m => new MenuDTO
         (
             IdMenu: m.Id,
             Name: m.Name,

@@ -47,4 +47,24 @@ public class PasswordHasherService : IPasswordHasher
 
         return CryptographicOperations.FixedTimeEquals(hash, inputHash);
     }
+
+    public string GetRandomGeneratedPassword()
+    {
+        // Genera una string aleatoria de 12 caracteres que incluya letras mayúsculas, minúsculas, números y símbolos
+        const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const string lower = "abcdefghijklmnopqrstuvwxyz";
+        const string digits = "0123456789";
+        const string symbols = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        const string allChars = upper + lower + digits + symbols;
+
+        var random = new Random();
+        char[] password = new char[12];
+
+        for (int i = 0; i < password.Length; i++)
+        {
+            password[i] = allChars[random.Next(allChars.Length)];
+        }
+
+        return new string(password);
+    }
 }

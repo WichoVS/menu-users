@@ -23,7 +23,8 @@ public class MenuToUserRepository : IMenuToUserRepository
 
     public async Task<bool> DeleteAsync(MenuToUser entity)
     {
-        MenuToUser? menuToUser = await _context.MenuToUsers.FindAsync(entity.Id);
+        MenuToUser? menuToUser = await _context.MenuToUsers
+        .FirstOrDefaultAsync(mtU => mtU.UserId == entity.UserId && mtU.MenuId == entity.MenuId);
         if (menuToUser == null)
         {
             return false;

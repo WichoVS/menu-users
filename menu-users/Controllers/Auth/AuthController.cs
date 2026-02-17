@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using menu_users.Application.DTOs.Auth;
+using menu_users.Application.Features.Auth.LoginUserUseCase;
+using menu_users.Domain.Interfaces.Features.Auth;
 using menu_users.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,18 +13,21 @@ namespace menu_users.Controllers.Auth
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly ILoginUserUseCase LoginUserUseCase;
+        private readonly IRegisterUserUseCase RegisterUserUseCase;
 
-        public AuthController(IAuthService authService)
+
+        public AuthController(ILoginUserUseCase loginUserUseCase, IRegisterUserUseCase registerUserUseCase)
         {
-            _authService = authService;
+            LoginUserUseCase = loginUserUseCase;
+            RegisterUserUseCase = registerUserUseCase;
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
         {
-            var result = await _authService.LoginAsync(request);
+            var result = await LoginUserUseCase.Execute(request);
 
             if (!result.Success)
             {
@@ -34,9 +39,9 @@ namespace menu_users.Controllers.Auth
 
         [HttpPost("signin")]
         [AllowAnonymous]
-        public async Task<IActionResult> SignIn([FromBody] SignInRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
         {
-            var result = await _authService.SignInAsync(request);
+            var result = await RegisterUserUseCase.Execute(request);
 
             if (!result.Success)
             {

@@ -17,7 +17,10 @@ public class MenuToUserService : IMenuToUserService
     private readonly IUserService _userService;
     private readonly IRoleService _roleService;
 
-    public MenuToUserService(IMenuToUserRepository menuToUserRepository, IMenuService menuService, IUserService userService, IRoleService roleService)
+    public MenuToUserService(IMenuToUserRepository menuToUserRepository,
+    IMenuService menuService,
+    IUserService userService,
+    IRoleService roleService)
     {
         _menuToUserRepository = menuToUserRepository;
         _menuService = menuService;
@@ -37,6 +40,33 @@ public class MenuToUserService : IMenuToUserService
         if (!menu.Success)
         {
             return new ApiResponse<MenuToUserDTO?>(false, "Menu not found", null);
+        }
+
+        // Verificamos si el menú ya está asignado al usuario
+        IEnumerable<MenuToUser> existingMenus = await _menuToUserRepository.GetMenusByUserIdAsync(userId);
+        if (existingMenus.Any(m => m.MenuId == menuId))
+        {
+            return new ApiResponse<MenuToUserDTO?>(true, "Menu already assigned to user", null);
+        }
+
+        // En caso de que el menú no esté asignado, procedemos a asignarlo al usuario
+        // Primero verificando si es un menú hijo, en ese caso se asigna el menú padre también
+        if (menu.Data!.ParentId != null)
+        {
+            int parentMenuId = menu.Data.ParentId.Value;
+
+            // Verificamos si el menú padre ya está asignado al usuario
+            if (!existingMenus.Any(m => m.MenuId == parentMenuId))
+            {
+                MenuToUser parentMenuToUser = new MenuToUser
+                {
+                    UserId = userId,
+                    MenuId = parentMenuId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _menuToUserRepository.AddAsync(parentMenuToUser);
+            }
         }
 
         MenuToUser menuToUser = new MenuToUser

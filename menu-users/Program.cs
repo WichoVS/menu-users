@@ -1,5 +1,16 @@
 using System.Text;
+using menu_users.Application.Features.Auth.LoginUserUseCase;
+using menu_users.Application.Features.Auth.RegisterUser;
+using menu_users.Application.Features.Users.CreateUserUseCase;
+using menu_users.Application.Features.Users.GeneratePasswordUseCase;
+using menu_users.Application.Features.Users.GetAllUsersUseCase;
+using menu_users.Application.Features.Users.GetUserByIdUseCase;
+using menu_users.Application.Features.Users.RemoveUserUseCase;
+using menu_users.Application.Features.Users.UpdatePasswordUseCase;
+using menu_users.Application.Features.Users.UpdateUserUseCase;
 using menu_users.Application.Services;
+using menu_users.Domain.Interfaces.Features.Auth;
+using menu_users.Domain.Interfaces.Features.User;
 using menu_users.Domain.Interfaces.Repositories;
 using menu_users.Domain.Interfaces.Services;
 using menu_users.Domain.Interfaces.Users;
@@ -16,9 +27,7 @@ var db = builder.Configuration.GetSection("db");
 //Servicios
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IMenuToUserService, MenuToUserService>();
 
@@ -27,6 +36,17 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuToUserRepository, MenuToUserRepository>();
+
+//UseCases
+builder.Services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
+builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+builder.Services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
+builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
+builder.Services.AddScoped<IGetUserByIdUseCase, GetUserByIdUseCase>();
+builder.Services.AddScoped<IRemoveUserUseCase, RemoveUserUseCase>();
+builder.Services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
+builder.Services.AddScoped<IGeneratePasswordUseCase, GeneratePasswordUseCase>();
+builder.Services.AddScoped<IUpdatePasswordUseCase, UpdatePasswordUseCase>();
 
 //DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
