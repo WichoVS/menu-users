@@ -19,7 +19,7 @@ public class UpdatePasswordUseCase : IUpdatePasswordUseCase
 
     public async Task<ApiResponse<bool>> Execute(Guid id, string newPassword)
     {
-        User? user = await _userRepository.GetByIdAsync(id);
+        User? user = await _userRepository.GetByGuidAsync(id);
         if (user == null)
         {
             return new ApiResponse<bool>(false, "User not found.", false);
